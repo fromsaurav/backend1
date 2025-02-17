@@ -90,8 +90,10 @@ app.get("/api/v1/candidates", async (req, res) => {
 
 
 
+
 dbConnection();
 
 app.use(errorMiddleware);
 
 export default app;
+  
