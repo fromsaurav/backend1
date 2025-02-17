@@ -16,6 +16,11 @@ export const sendOtp = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please provide an email address!", 400));
   }
 
+  // Verify if the email belongs to the college domain
+  if (!email.trim().toLowerCase().endsWith("@sggs.ac.in")) {
+    return next(new ErrorHandler("Invalid email! Only college email IDs are allowed.", 400));
+  }
+
   const otp = generateOtp();
   const otpExpires = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
 
@@ -32,7 +37,7 @@ export const sendOtp = catchAsyncErrors(async (req, res, next) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     port: 587,
-    secure: false, 
+    secure: false,
     requireTLS: true,
     auth: {
       user: process.env.EMAIL,
@@ -42,7 +47,6 @@ export const sendOtp = catchAsyncErrors(async (req, res, next) => {
       rejectUnauthorized: false, // Fixes self-signed certificate error
     },
   });
-  
 
   const mailOptions = {
     from: process.env.EMAIL,
@@ -59,7 +63,7 @@ export const sendOtp = catchAsyncErrors(async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error sending email: ", error);
-    return next(new ErrorHandler("Failed to send OTP email", 500));
+    return next(new ErrorHandler("Invalid email! Only college email IDs are allowed.", 500));
   }
 });
 
@@ -70,6 +74,11 @@ export const verifyOtp = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please provide email and OTP!", 400));
   }
 
+  // Verify if the email belongs to the college domain
+  if (!email.trim().toLowerCase().endsWith("@sggs.ac.in")) {
+    return next(new ErrorHandler("Invalid email! Only college email IDs are allowed.", 400));
+  }
+
   const userOtp = await Otp.findOne({ email, otp });
 
   if (!userOtp || userOtp.otpExpires < Date.now()) {
@@ -77,13 +86,9 @@ export const verifyOtp = catchAsyncErrors(async (req, res, next) => {
   }
 
   await Otp.deleteOne({ email });
-  console.log('done');
   
   res.status(200).json({
     success: true,
-    
     message: "OTP verified successfully",
-   
   });
-  console.log('done')
 });

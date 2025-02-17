@@ -20,5 +20,5 @@ cloudinary.v2.config({
 // }, 600000); // 10 minutes in milliseconds (600,000 ms)
 
 app.listen(process.env.PORT, () => {
-  console.log(`Server listening at port ${process.env.PORT}`);
+  console.log(`App is listening on Port ${process.env.PORT}`);
 });
