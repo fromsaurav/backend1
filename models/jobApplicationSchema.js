@@ -217,6 +217,12 @@ const jobApplicationSchema = new mongoose.Schema({
       default: () => ({})
     }
   },
+  isVoted: {
+    type: Boolean,
+    default: false
+    
+    
+  },
   amount: {
     type: Number,
     min: [0, "Package must be a positive number!"],

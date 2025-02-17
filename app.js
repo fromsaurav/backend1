@@ -12,6 +12,7 @@ import companyRoutes from "./router/companyRoutes.js";
 import testRouter from "./router/testRouter.js";
 import {sendOtp,verifyOtp} from "./controller/otpController.js";
 import { sendBulkEmails, sendCorrectionEmail } from "./controller/eController.js";
+import { addCandidate, removeCandidate, addVote , getAllCandidates, checkVoteStatus, updateVotingStatus} from "./controller/candidatecontroller.js"
 
 const app = express();
 config({ path: ".env" });
@@ -45,6 +46,48 @@ app.use("/api/v1/message", messageRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/jobApplication", jobApplicationRouter);
 app.use("/api/v1/test", testRouter);
+
+app.post("/api/v1/candidate", async (req, res) => {
+  const { name } = req.body;
+  try {
+    const response = await addCandidate(name);
+    res.status(response.success ? 201 : 400).json(response);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.delete("/api/v1/cc/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await removeCandidate(id);
+    res.status(response.success ? 200 : 404).json(response);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+app.get("/api/v1/ch", checkVoteStatus);
+app.put("/api/v1/up", updateVotingStatus);
+
+app.put("/api/v1/candidate/vote/:id", async (req, res) => {
+  const { id } = req.params;
+  const { voteCount } = req.body; // Optional field for custom vote increment
+  try {
+    const response = await addVote(id, voteCount || 1);
+    res.status(response.success ? 200 : 404).json(response);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+app.get("/api/v1/candidates", async (req, res) => {
+  try {
+    const response = await getAllCandidates();
+    res.status(response.success ? 200 : 500).json(response);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 
 
 dbConnection();
