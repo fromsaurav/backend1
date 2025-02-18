@@ -37,4 +37,3 @@ candidateSchema.statics.removeCandidate = async function (id) {
 };
 
 export const Candidate = mongoose.model('Candidate', candidateSchema);
-
